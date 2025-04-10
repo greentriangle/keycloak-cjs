@@ -7,7 +7,7 @@
     "build": "esbuild index.ts --platform=node --bundle --format=cjs --outfile=index.js"
   },
   "dependencies": {
-    "@keycloak/keycloak-admin-client": "26.0.5"
+    "@keycloak/keycloak-admin-client": "26.1.4"
   },
   "devDependencies": {
     "esbuild": "^0.20.0"

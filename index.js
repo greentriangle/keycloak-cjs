@@ -657,6 +657,14 @@ var Cache = class extends Resource {
     method: "POST",
     path: "/clear-user-cache"
   });
+  clearKeysCache = this.makeRequest({
+    method: "POST",
+    path: "/clear-keys-cache"
+  });
+  clearRealmCache = this.makeRequest({
+    method: "POST",
+    path: "/clear-realm-cache"
+  });
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}",

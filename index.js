@@ -354,7 +354,7 @@ var Agent = class {
     } else {
       requestOptions.body = payloadKey && typeof payload[payloadKey] === "string" ? payload[payloadKey] : JSON.stringify(payloadKey ? payload[payloadKey] : payload);
     }
-    if (!requestHeaders.has("content-type") && !(payload instanceof FormData)) {
+    if (requestOptions.body && !requestHeaders.has("content-type") && !(payload instanceof FormData)) {
       requestHeaders.set("content-type", "application/json");
     }
     if (queryParams) {
@@ -661,6 +661,10 @@ var Cache = class extends Resource {
     method: "POST",
     path: "/clear-keys-cache"
   });
+  clearCrlCache = this.makeRequest({
+    method: "POST",
+    path: "/clear-crl-cache"
+  });
   clearRealmCache = this.makeRequest({
     method: "POST",
     path: "/clear-realm-cache"
@@ -931,7 +935,7 @@ var Clients = class extends Resource {
     method: "GET",
     path: "/{id}/evaluate-scopes/generate-example-access-token",
     urlParamKeys: ["id"],
-    queryParamKeys: ["scope", "userId"]
+    queryParamKeys: ["scope", "userId", "audience"]
   });
   evaluateGenerateUserInfo = this.makeRequest({
     method: "GET",
@@ -1131,6 +1135,11 @@ var Clients = class extends Resource {
     method: "GET",
     path: "/{id}/authz/resource-server/resource/{resourceName}/scopes",
     urlParamKeys: ["id", "resourceName"]
+  });
+  listPermissionScope = this.makeRequest({
+    method: "GET",
+    path: "/{id}/authz/resource-server/permission/scope",
+    urlParamKeys: ["id"]
   });
   createAuthorizationScope = this.makeUpdateRequest({
     method: "POST",

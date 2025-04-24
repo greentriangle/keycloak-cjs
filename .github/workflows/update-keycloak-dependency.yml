@@ -1,0 +1,99 @@
+name: Update Keycloak Admin Client
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1'
+
+jobs:
+  update-dependency:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Get current version
+        id: current-version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').dependencies['@keycloak/keycloak-admin-client']")
+          echo "Current version: $CURRENT_VERSION"
+          echo "currentVersion=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check latest version
+        id: latest-version
+        run: |
+          LATEST_VERSION=$(npm view @keycloak/keycloak-admin-client version)
+          echo "Latest version: $LATEST_VERSION"
+          echo "latestVersion=$LATEST_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update package.json if new version available
+        id: update-pkg
+        if: steps.current-version.outputs.currentVersion != steps.latest-version.outputs.latestVersion
+        run: |
+          echo "New version available. Updating from ${{ steps.current-version.outputs.currentVersion }} to ${{ steps.latest-version.outputs.latestVersion }}"
+          # Update the version in package.json
+          sed -i 's/"@keycloak\/keycloak-admin-client": "[^"]*"/"@keycloak\/keycloak-admin-client": "${{ steps.latest-version.outputs.latestVersion }}"/g' package.json
+          echo "updated=true" >> $GITHUB_OUTPUT
+          echo "NEW_VERSION=${{ steps.latest-version.outputs.latestVersion }}" >> $GITHUB_ENV
+          # Create a unique branch name with version
+          echo "BRANCH_NAME=update-keycloak-dependency-v${{ steps.latest-version.outputs.latestVersion }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        if: steps.update-pkg.outputs.updated == 'true'
+        run: yarn install
+
+      - name: Build project
+        if: steps.update-pkg.outputs.updated == 'true'
+        run: yarn run build
+
+      - name: Update package version
+        if: steps.update-pkg.outputs.updated == 'true'
+        run: |
+          # Extract version number without any potential prefixes like ^, ~ or v
+          CLEAN_VERSION=$(echo "${{ steps.latest-version.outputs.latestVersion }}" | sed 's/[^0-9\.]//g')
+          
+          # Update package.json version to match Keycloak dependency version
+          # First use jq to update the version field directly in the package.json
+          jq --arg version "$CLEAN_VERSION" '.version = $version' package.json > package.json.tmp && mv package.json.tmp package.json
+          
+          echo "Updated package version to $CLEAN_VERSION"
+          echo "PACKAGE_VERSION=$CLEAN_VERSION" >> $GITHUB_ENV
+
+      - name: Create Pull Request
+        if: steps.update-pkg.outputs.updated == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "Bumps @keycloak/keycloak-admin-client to v${{ env.NEW_VERSION }}"
+          title: "Bumps @keycloak/keycloak-admin-client to v${{ env.NEW_VERSION }}"
+          body: |
+            This PR updates the @keycloak/keycloak-admin-client dependency from v${{ steps.current-version.outputs.currentVersion }} to v${{ env.NEW_VERSION }}.
+            
+            - Updated package.json
+            - Updated yarn.lock
+            - Rebuilt the project
+            
+            This is an automated PR created by the GitHub Actions workflow.
+          branch: ${{ env.BRANCH_NAME }}
+          reviewers: |
+            savv
+            pranshuchittora
+          base: master
+          delete-branch: true
+
+      - name: Create and push tag
+        if: steps.update-pkg.outputs.updated == 'true'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git tag -a "v${{ env.PACKAGE_VERSION }}" -m "Release version ${{ env.PACKAGE_VERSION }}" -f
+          git push origin "v${{ env.PACKAGE_VERSION }}" -f

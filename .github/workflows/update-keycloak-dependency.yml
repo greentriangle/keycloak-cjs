@@ -2,11 +2,8 @@ name: Update Keycloak Admin Client
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize]
   schedule:
-    - cron: "0 0 * * 1"
-
+    - cron: '0 0 * * 1'
 
 jobs:
   update-dependency:
@@ -14,7 +11,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,8 +19,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "yarn"
+          node-version: '20'
+          cache: 'yarn'
 
       - name: Get current version
         id: current-version
@@ -64,16 +61,15 @@ jobs:
         run: |
           # Extract version number without any potential prefixes like ^, ~ or v
           CLEAN_VERSION=$(echo "${{ steps.latest-version.outputs.latestVersion }}" | sed 's/[^0-9\.]//g')
-
+          
           # Update package.json version to match Keycloak dependency version
           # First use jq to update the version field directly in the package.json
           jq --arg version "$CLEAN_VERSION" '.version = $version' package.json > package.json.tmp && mv package.json.tmp package.json
-
+          
           echo "Updated package version to $CLEAN_VERSION"
           echo "PACKAGE_VERSION=$CLEAN_VERSION" >> $GITHUB_ENV
 
       - name: Create Pull Request
-        id: cpr
         if: steps.update-pkg.outputs.updated == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
@@ -81,11 +77,11 @@ jobs:
           title: "Bumps @keycloak/keycloak-admin-client to v${{ env.NEW_VERSION }}"
           body: |
             This PR updates the @keycloak/keycloak-admin-client dependency from v${{ steps.current-version.outputs.currentVersion }} to v${{ env.NEW_VERSION }}.
-
+            
             - Updated package.json
             - Updated yarn.lock
             - Rebuilt the project
-
+            
             This is an automated PR created by the GitHub Actions workflow.
           branch: ${{ env.BRANCH_NAME }}
           reviewers: |
@@ -94,13 +90,6 @@ jobs:
           base: master
           delete-branch: true
 
-      - name: Enable auto-merge for PR
-        if: steps.update-pkg.outputs.updated == 'true' && steps.cpr.outputs.pull-request-number
-        run: |
-          gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
-          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} --auto --merge
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create and push tag
         if: steps.update-pkg.outputs.updated == 'true'
         run: |

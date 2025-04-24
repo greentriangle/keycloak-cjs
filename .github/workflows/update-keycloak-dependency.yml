@@ -84,6 +84,9 @@ jobs:
             
             This is an automated PR created by the GitHub Actions workflow.
           branch: ${{ env.BRANCH_NAME }}
+          reviewers: |
+            savv
+            pranshuchittora
           base: master
           delete-branch: true
 

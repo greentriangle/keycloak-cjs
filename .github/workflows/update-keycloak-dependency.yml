@@ -2,10 +2,8 @@ name: Update Keycloak Admin Client
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize]
   schedule:
-    - cron: '0 0 * * 1'  # Run weekly on Mondays at midnight
+    - cron: '0 0 * * 1'
 
 jobs:
   update-dependency:

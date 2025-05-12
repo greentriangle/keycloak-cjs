@@ -1,13 +1,13 @@
 {
   "name": "@greentriangle/keycloak-cjs",
-  "version": "26.2.2",
+  "version": "26.2.4",
   "main": "./index.js",
   "types": "./index.d.ts",
   "scripts": {
     "build": "esbuild index.ts --platform=node --bundle --format=cjs --outfile=index.js"
   },
   "dependencies": {
-    "@keycloak/keycloak-admin-client": "26.2.2"
+    "@keycloak/keycloak-admin-client": "26.2.4"
   },
   "devDependencies": {
     "esbuild": "^0.20.0"

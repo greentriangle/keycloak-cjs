@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   update-dependency:
@@ -85,7 +87,6 @@ jobs:
             This is an automated PR created by the GitHub Actions workflow.
           branch: ${{ env.BRANCH_NAME }}
           reviewers: |
-            savv
             pranshuchittora
           base: master
           delete-branch: true

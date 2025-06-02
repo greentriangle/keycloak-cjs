@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   update-dependency:
@@ -48,26 +50,56 @@ jobs:
           # Create a unique branch name with version
           echo "BRANCH_NAME=update-keycloak-dependency-v${{ steps.latest-version.outputs.latestVersion }}" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        if: steps.update-pkg.outputs.updated == 'true'
-        run: yarn install
-
-      - name: Build project
-        if: steps.update-pkg.outputs.updated == 'true'
-        run: yarn run build
-
-      - name: Update package version
+      - name: Install dependencies and build project
         if: steps.update-pkg.outputs.updated == 'true'
         run: |
-          # Extract version number without any potential prefixes like ^, ~ or v
+          # Show git status before any changes
+          echo "=== Git status before install ==="
+          git status --porcelain
+          
+          # Install dependencies
+          yarn install
+          
+          # Show git status after install
+          echo "=== Git status after install ==="
+          git status --porcelain
+          
+          # Update package version to match Keycloak dependency version BEFORE build
           CLEAN_VERSION=$(echo "${{ steps.latest-version.outputs.latestVersion }}" | sed 's/[^0-9\.]//g')
-          
-          # Update package.json version to match Keycloak dependency version
-          # First use jq to update the version field directly in the package.json
           jq --arg version "$CLEAN_VERSION" '.version = $version' package.json > package.json.tmp && mv package.json.tmp package.json
-          
           echo "Updated package version to $CLEAN_VERSION"
           echo "PACKAGE_VERSION=$CLEAN_VERSION" >> $GITHUB_ENV
+          
+          # Show git status after package version update
+          echo "=== Git status after package version update ==="
+          git status --porcelain
+          
+          # Build the project to generate index.js
+          echo "=== Building project ==="
+          yarn run build
+          
+          # Show git status after build
+          echo "=== Git status after build ==="
+          git status --porcelain
+          
+          # Show detailed info about index.js
+          if [ -f "index.js" ]; then
+            echo "=== index.js file info ==="
+            ls -la index.js
+            echo "=== index.js git diff check ==="
+            if git diff --name-only | grep -q "index.js"; then
+              echo "index.js is in git diff (has changes)"
+              git diff --stat index.js
+            else
+              echo "index.js is NOT in git diff"
+            fi
+          else
+            echo "ERROR: index.js was not created"
+          fi
+          
+          # Show all changed files
+          echo "=== All changed files ==="
+          git diff --name-only
 
       - name: Create Pull Request
         if: steps.update-pkg.outputs.updated == 'true'
@@ -78,17 +110,20 @@ jobs:
           body: |
             This PR updates the @keycloak/keycloak-admin-client dependency from v${{ steps.current-version.outputs.currentVersion }} to v${{ env.NEW_VERSION }}.
             
-            - Updated package.json
+            - Updated package.json dependency and version
             - Updated yarn.lock
-            - Rebuilt the project
+            - Rebuilt index.js with new dependency
             
             This is an automated PR created by the GitHub Actions workflow.
           branch: ${{ env.BRANCH_NAME }}
           reviewers: |
-            savv
             pranshuchittora
           base: master
           delete-branch: true
+          add-paths: |
+            package.json
+            yarn.lock
+            index.js
 
       - name: Create and push tag
         if: steps.update-pkg.outputs.updated == 'true'

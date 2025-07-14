@@ -54,7 +54,7 @@ jobs:
 
       - name: Build project
         if: steps.update-pkg.outputs.updated == 'true'
-        run: yarn run build
+        run: yarn run build:cjs
 
       - name: Update package version
         if: steps.update-pkg.outputs.updated == 'true'

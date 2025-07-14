@@ -4,7 +4,7 @@
   "main": "./index.js",
   "types": "./index.d.ts",
   "scripts": {
-    "build": "esbuild index.ts --platform=node --bundle --format=cjs --outfile=index.js"
+    "build:cjs": "esbuild index.ts --platform=node --bundle --format=cjs --outfile=index.js"
   },
   "dependencies": {
     "@keycloak/keycloak-admin-client": "26.2.5"

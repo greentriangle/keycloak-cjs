@@ -2,6 +2,7 @@ var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
@@ -17,12 +18,12 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // index.ts
-var keycloak_cjs_exports = {};
-__export(keycloak_cjs_exports, {
+var index_exports = {};
+__export(index_exports, {
   KeycloakAdminClient: () => lib_default,
   requiredAction: () => requiredAction
 });
-module.exports = __toCommonJS(keycloak_cjs_exports);
+module.exports = __toCommonJS(index_exports);
 
 // node_modules/url-join/lib/url-join.js
 function normalize(strArray) {
@@ -66,6 +67,7 @@ function normalize(strArray) {
   str = parts.shift() + (parts.length > 0 ? "?" : "") + parts.join("&");
   return str;
 }
+__name(normalize, "normalize");
 function urlJoin() {
   var input;
   if (typeof arguments[0] === "object") {
@@ -75,6 +77,7 @@ function urlJoin() {
   }
   return normalize(input);
 }
+__name(urlJoin, "urlJoin");
 
 // node_modules/url-template/lib/url-template.js
 function encodeReserved(str) {
@@ -85,11 +88,13 @@ function encodeReserved(str) {
     return part;
   }).join("");
 }
+__name(encodeReserved, "encodeReserved");
 function encodeUnreserved(str) {
   return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
     return "%" + c.charCodeAt(0).toString(16).toUpperCase();
   });
 }
+__name(encodeUnreserved, "encodeUnreserved");
 function encodeValue(operator, value, key) {
   value = operator === "+" || operator === "#" ? encodeReserved(value) : encodeUnreserved(value);
   if (key) {
@@ -98,12 +103,15 @@ function encodeValue(operator, value, key) {
     return value;
   }
 }
+__name(encodeValue, "encodeValue");
 function isDefined(value) {
   return value !== void 0 && value !== null;
 }
+__name(isDefined, "isDefined");
 function isKeyOperator(operator) {
   return operator === ";" || operator === "&" || operator === "?";
 }
+__name(isKeyOperator, "isKeyOperator");
 function getValues(context, operator, key, modifier) {
   var value = context[key], result = [];
   if (isDefined(value) && value !== "") {
@@ -160,10 +168,11 @@ function getValues(context, operator, key, modifier) {
   }
   return result;
 }
+__name(getValues, "getValues");
 function parseTemplate(template) {
   var operators = ["+", "#", ".", "/", ";", "?", "&"];
   return {
-    expand: function(context) {
+    expand: /* @__PURE__ */ __name(function(context) {
       return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function(_, expression, literal) {
         if (expression) {
           var operator = null, values = [];
@@ -190,13 +199,17 @@ function parseTemplate(template) {
           return encodeReserved(literal);
         }
       });
-    }
+    }, "expand")
   };
 }
+__name(parseTemplate, "parseTemplate");
 
 // node_modules/@keycloak/keycloak-admin-client/lib/utils/fetchWithError.js
 var ERROR_FIELDS = ["error", "errorMessage"];
 var NetworkError = class extends Error {
+  static {
+    __name(this, "NetworkError");
+  }
   response;
   responseData;
   constructor(message, options) {
@@ -217,6 +230,7 @@ async function fetchWithError(input, init) {
   }
   return response;
 }
+__name(fetchWithError, "fetchWithError");
 async function parseResponse(response) {
   if (!response.body) {
     return "";
@@ -228,6 +242,7 @@ async function parseResponse(response) {
     return data;
   }
 }
+__name(parseResponse, "parseResponse");
 function getErrorMessage(data) {
   if (typeof data !== "object" || data === null) {
     return "Unable to determine error message.";
@@ -240,6 +255,7 @@ function getErrorMessage(data) {
   }
   return "Network response was not OK.";
 }
+__name(getErrorMessage, "getErrorMessage");
 
 // node_modules/@keycloak/keycloak-admin-client/lib/utils/stringifyQueryParams.js
 function stringifyQueryParams(params) {
@@ -262,17 +278,21 @@ function stringifyQueryParams(params) {
   }
   return searchParams.toString();
 }
+__name(stringifyQueryParams, "stringifyQueryParams");
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/agent.js
 var SLASH = "/";
-var pick = (value, keys) => Object.fromEntries(Object.entries(value).filter(([key]) => keys.includes(key)));
-var omit = (value, keys) => Object.fromEntries(Object.entries(value).filter(([key]) => !keys.includes(key)));
+var pick = /* @__PURE__ */ __name((value, keys) => Object.fromEntries(Object.entries(value).filter(([key]) => keys.includes(key))), "pick");
+var omit = /* @__PURE__ */ __name((value, keys) => Object.fromEntries(Object.entries(value).filter(([key]) => !keys.includes(key))), "omit");
 var Agent = class {
+  static {
+    __name(this, "Agent");
+  }
   #client;
   #basePath;
   #getBaseParams;
   #getBaseUrl;
-  constructor({ client, path = "/", getUrlParams = () => ({}), getBaseUrl = () => client.baseUrl }) {
+  constructor({ client, path = "/", getUrlParams = /* @__PURE__ */ __name(() => ({}), "getUrlParams"), getBaseUrl = /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl") }) {
     this.#client = client;
     this.#getBaseParams = getUrlParams;
     this.#getBaseUrl = getBaseUrl;
@@ -407,6 +427,9 @@ var Agent = class {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/resource.js
 var Resource = class {
+  static {
+    __name(this, "Resource");
+  }
   #agent;
   constructor(client, settings = {}) {
     this.#agent = new Agent({
@@ -414,17 +437,20 @@ var Resource = class {
       ...settings
     });
   }
-  makeRequest = (args) => {
+  makeRequest = /* @__PURE__ */ __name((args) => {
     return this.#agent.request(args);
-  };
+  }, "makeRequest");
   // update request will take three types: query, payload and response
-  makeUpdateRequest = (args) => {
+  makeUpdateRequest = /* @__PURE__ */ __name((args) => {
     return this.#agent.updateRequest(args);
-  };
+  }, "makeUpdateRequest");
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/attackDetection.js
 var AttackDetection = class extends Resource {
+  static {
+    __name(this, "AttackDetection");
+  }
   findOne = this.makeRequest({
     method: "GET",
     path: "/users/{id}",
@@ -443,16 +469,19 @@ var AttackDetection = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/attack-detection/brute-force",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/authenticationManagement.js
 var AuthenticationManagement = class extends Resource {
+  static {
+    __name(this, "AuthenticationManagement");
+  }
   /**
    * Authentication Management
    * https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_authentication_management_resource
@@ -643,16 +672,19 @@ var AuthenticationManagement = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/authentication",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/cache.js
 var Cache = class extends Resource {
+  static {
+    __name(this, "Cache");
+  }
   clearUserCache = this.makeRequest({
     method: "POST",
     path: "/clear-user-cache"
@@ -672,23 +704,26 @@ var Cache = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/clientPolicies.js
 var ClientPolicies = class extends Resource {
+  static {
+    __name(this, "ClientPolicies");
+  }
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/client-policies",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
   /* Client Profiles */
@@ -721,6 +756,9 @@ var ClientPolicies = class extends Resource {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/clients.js
 var Clients = class extends Resource {
+  static {
+    __name(this, "Clients");
+  }
   find = this.makeRequest({
     method: "GET"
   });
@@ -1283,10 +1321,10 @@ var Clients = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/clients",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
   /**
@@ -1303,6 +1341,9 @@ var Clients = class extends Resource {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/clientScopes.js
 var ClientScopes = class extends Resource {
+  static {
+    __name(this, "ClientScopes");
+  }
   find = this.makeRequest({
     method: "GET",
     path: "/client-scopes"
@@ -1466,10 +1507,10 @@ var ClientScopes = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
   /**
@@ -1508,6 +1549,9 @@ var ClientScopes = class extends Resource {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/components.js
 var Components = class extends Resource {
+  static {
+    __name(this, "Components");
+  }
   /**
    * components
    * https://www.keycloak.org/docs-api/11.0/rest-api/#_component_resource
@@ -1544,16 +1588,19 @@ var Components = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/components",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/groups.js
 var Groups = class extends Resource {
+  static {
+    __name(this, "Groups");
+  }
   find = this.makeRequest({
     method: "GET",
     queryParamKeys: [
@@ -1717,16 +1764,19 @@ var Groups = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/groups",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/identityProviders.js
 var IdentityProviders = class extends Resource {
+  static {
+    __name(this, "IdentityProviders");
+  }
   /**
    * Identity provider
    * https://www.keycloak.org/docs-api/11.0/rest-api/#_identity_providers_resource
@@ -1816,16 +1866,19 @@ var IdentityProviders = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/identity-provider",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/realms.js
 var Realms = class extends Resource {
+  static {
+    __name(this, "Realms");
+  }
   /**
    * Realm
    * https://www.keycloak.org/docs-api/11.0/rest-api/#_realms_admin_resource
@@ -2055,23 +2108,26 @@ var Realms = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms",
-      getBaseUrl: () => client.baseUrl
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/organizations.js
 var Organizations = class extends Resource {
+  static {
+    __name(this, "Organizations");
+  }
   /**
    * Organizations
    */
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/organizations",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
   find = this.makeRequest({
@@ -2148,6 +2204,9 @@ var Organizations = class extends Resource {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/roles.js
 var Roles = class extends Resource {
+  static {
+    __name(this, "Roles");
+  }
   /**
    * Realm roles
    */
@@ -2245,20 +2304,23 @@ var Roles = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/serverInfo.js
 var ServerInfo = class extends Resource {
+  static {
+    __name(this, "ServerInfo");
+  }
   constructor(client) {
     super(client, {
       path: "/",
-      getBaseUrl: () => client.baseUrl
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
   find = this.makeRequest({
@@ -2275,6 +2337,9 @@ var ServerInfo = class extends Resource {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/users.js
 var Users = class extends Resource {
+  static {
+    __name(this, "Users");
+  }
   find = this.makeRequest({
     method: "GET"
   });
@@ -2566,16 +2631,19 @@ var Users = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/users",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/userStorageProvider.js
 var UserStorageProvider = class extends Resource {
+  static {
+    __name(this, "UserStorageProvider");
+  }
   name = this.makeRequest({
     method: "GET",
     path: "/{id}/name",
@@ -2606,23 +2674,26 @@ var UserStorageProvider = class extends Resource {
   constructor(client) {
     super(client, {
       path: "/admin/realms/{realm}/user-storage",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/whoAmI.js
 var WhoAmI = class extends Resource {
+  static {
+    __name(this, "WhoAmI");
+  }
   constructor(client) {
     super(client, {
       path: "/admin/{realm}/console",
-      getUrlParams: () => ({
+      getUrlParams: /* @__PURE__ */ __name(() => ({
         realm: client.realmName
-      }),
-      getBaseUrl: () => client.baseUrl
+      }), "getUrlParams"),
+      getBaseUrl: /* @__PURE__ */ __name(() => client.baseUrl, "getBaseUrl")
     });
   }
   find = this.makeRequest({
@@ -2638,6 +2709,7 @@ function camelCase(str) {
     return x.toUpperCase();
   });
 }
+__name(camelCase, "camelCase");
 function walk(obj, shallow = false) {
   if (!obj || typeof obj !== "object")
     return obj;
@@ -2659,20 +2731,22 @@ function walk(obj, shallow = false) {
     return res;
   }, {});
 }
+__name(walk, "walk");
 function camelize(obj, shallow) {
   return typeof obj === "string" ? camelCase(obj) : walk(obj, shallow);
 }
+__name(camelize, "camelize");
 
 // node_modules/@keycloak/keycloak-admin-client/lib/utils/constants.js
 var defaultBaseUrl = "http://127.0.0.1:8180";
 var defaultRealm = "master";
 
 // node_modules/@keycloak/keycloak-admin-client/lib/utils/auth.js
-var bytesToBase64 = (bytes) => btoa(Array.from(bytes, (byte) => String.fromCodePoint(byte)).join(""));
-var toBase64 = (input) => bytesToBase64(new TextEncoder().encode(input));
-var encodeRFC3986URIComponent = (input) => encodeURIComponent(input).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
-var encodeFormURIComponent = (data) => encodeRFC3986URIComponent(data).replaceAll("%20", "+");
-var getToken = async (settings) => {
+var bytesToBase64 = /* @__PURE__ */ __name((bytes) => btoa(Array.from(bytes, (byte) => String.fromCodePoint(byte)).join("")), "bytesToBase64");
+var toBase64 = /* @__PURE__ */ __name((input) => bytesToBase64(new TextEncoder().encode(input)), "toBase64");
+var encodeRFC3986URIComponent = /* @__PURE__ */ __name((input) => encodeURIComponent(input).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`), "encodeRFC3986URIComponent");
+var encodeFormURIComponent = /* @__PURE__ */ __name((data) => encodeRFC3986URIComponent(data).replaceAll("%20", "+"), "encodeFormURIComponent");
+var getToken = /* @__PURE__ */ __name(async (settings) => {
   const baseUrl = settings.baseUrl || defaultBaseUrl;
   const realmName = settings.realmName || defaultRealm;
   const url = `${baseUrl}/realms/${realmName}/protocol/openid-connect/token`;
@@ -2706,10 +2780,13 @@ var getToken = async (settings) => {
   });
   const data = await response.json();
   return camelize(data);
-};
+}, "getToken");
 
 // node_modules/@keycloak/keycloak-admin-client/lib/client.js
 var KeycloakAdminClient = class {
+  static {
+    __name(this, "KeycloakAdminClient");
+  }
   // Resources
   users;
   userStorageProvider;

@@ -2146,6 +2146,32 @@ var Organizations = class extends Resource {
   });
 };
 
+// node_modules/@keycloak/keycloak-admin-client/lib/resources/workflows.js
+var Workflows = class extends Resource {
+  constructor(client) {
+    super(client, {
+      path: "/admin/realms/{realm}/workflows",
+      getUrlParams: () => ({
+        realm: client.realmName
+      }),
+      getBaseUrl: () => client.baseUrl
+    });
+  }
+  find = this.makeRequest({
+    method: "GET",
+    path: "/"
+  });
+  create = this.makeRequest({
+    method: "POST",
+    returnResourceIdInLocationHeader: { field: "id" }
+  });
+  delById = this.makeRequest({
+    method: "DELETE",
+    path: "/{id}",
+    urlParamKeys: ["id"]
+  });
+};
+
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/roles.js
 var Roles = class extends Resource {
   /**
@@ -2716,6 +2742,7 @@ var KeycloakAdminClient = class {
   groups;
   roles;
   organizations;
+  workflows;
   clients;
   realms;
   clientScopes;
@@ -2746,6 +2773,7 @@ var KeycloakAdminClient = class {
     this.groups = new Groups(this);
     this.roles = new Roles(this);
     this.organizations = new Organizations(this);
+    this.workflows = new Workflows(this);
     this.clients = new Clients(this);
     this.realms = new Realms(this);
     this.clientScopes = new ClientScopes(this);

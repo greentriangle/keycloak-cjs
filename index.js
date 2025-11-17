@@ -1068,10 +1068,16 @@ var Clients = class extends Resource {
     path: "/{id}/authz/resource-server/policy/{type}",
     urlParamKeys: ["id", "type"]
   });
-  findOnePolicy = this.makeRequest({
+  findOnePolicyWithType = this.makeRequest({
     method: "GET",
     path: "/{id}/authz/resource-server/policy/{type}/{policyId}",
     urlParamKeys: ["id", "type", "policyId"],
+    catchNotFound: true
+  });
+  findOnePolicy = this.makeRequest({
+    method: "GET",
+    path: "/{id}/authz/resource-server/policy/{policyId}",
+    urlParamKeys: ["id", "policyId"],
     catchNotFound: true
   });
   listDependentPolicies = this.makeRequest({

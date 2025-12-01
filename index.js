@@ -24,58 +24,6 @@ __export(keycloak_cjs_exports, {
 });
 module.exports = __toCommonJS(keycloak_cjs_exports);
 
-// node_modules/url-join/lib/url-join.js
-function normalize(strArray) {
-  var resultArray = [];
-  if (strArray.length === 0) {
-    return "";
-  }
-  if (typeof strArray[0] !== "string") {
-    throw new TypeError("Url must be a string. Received " + strArray[0]);
-  }
-  if (strArray[0].match(/^[^/:]+:\/*$/) && strArray.length > 1) {
-    var first = strArray.shift();
-    strArray[0] = first + strArray[0];
-  }
-  if (strArray[0].match(/^file:\/\/\//)) {
-    strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, "$1:///");
-  } else {
-    strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, "$1://");
-  }
-  for (var i = 0; i < strArray.length; i++) {
-    var component = strArray[i];
-    if (typeof component !== "string") {
-      throw new TypeError("Url must be a string. Received " + component);
-    }
-    if (component === "") {
-      continue;
-    }
-    if (i > 0) {
-      component = component.replace(/^[\/]+/, "");
-    }
-    if (i < strArray.length - 1) {
-      component = component.replace(/[\/]+$/, "");
-    } else {
-      component = component.replace(/[\/]+$/, "/");
-    }
-    resultArray.push(component);
-  }
-  var str = resultArray.join("/");
-  str = str.replace(/\/(\?|&|#[^!])/g, "$1");
-  var parts = str.split("?");
-  str = parts.shift() + (parts.length > 0 ? "?" : "") + parts.join("&");
-  return str;
-}
-function urlJoin() {
-  var input;
-  if (typeof arguments[0] === "object") {
-    input = arguments[0];
-  } else {
-    input = [].slice.call(arguments);
-  }
-  return normalize(input);
-}
-
 // node_modules/url-template/lib/url-template.js
 function encodeReserved(str) {
   return str.split(/(%[0-9A-Fa-f]{2})/g).map(function(part) {
@@ -241,6 +189,23 @@ function getErrorMessage(data) {
   return "Network response was not OK.";
 }
 
+// node_modules/@keycloak/keycloak-admin-client/lib/utils/joinPath.js
+var PATH_SEPARATOR = "/";
+function joinPath(...paths) {
+  const normalizedPaths = paths.map((path, index) => {
+    const isFirst = index === 0;
+    const isLast = index === paths.length - 1;
+    if (!isFirst && path.startsWith(PATH_SEPARATOR)) {
+      path = path.slice(1);
+    }
+    if (!isLast && path.endsWith(PATH_SEPARATOR)) {
+      path = path.slice(0, -1);
+    }
+    return path;
+  }, []);
+  return normalizedPaths.join(PATH_SEPARATOR);
+}
+
 // node_modules/@keycloak/keycloak-admin-client/lib/utils/stringifyQueryParams.js
 function stringifyQueryParams(params) {
   const searchParams = new URLSearchParams();
@@ -333,10 +298,6 @@ var Agent = class {
     };
   }
   async #requestWithParams({ method, path, payload, urlParams, queryParams, catchNotFound, payloadKey, returnResourceIdInLocationHeader, headers }) {
-    const newPath = urlJoin(this.#basePath, path);
-    const pathTemplate = parseTemplate(newPath);
-    const parsedPath = pathTemplate.expand(urlParams);
-    const url = new URL(`${this.#getBaseUrl?.() ?? ""}${parsedPath}`);
     const requestOptions = { ...this.#client.getRequestOptions() };
     const requestHeaders = new Headers([
       ...new Headers(requestOptions.headers).entries(),
@@ -360,6 +321,9 @@ var Agent = class {
     if (queryParams) {
       Object.assign(searchParams, queryParams);
     }
+    const url = new URL(this.#getBaseUrl());
+    const pathTemplate = parseTemplate(joinPath(this.#basePath, path));
+    url.pathname = joinPath(url.pathname, pathTemplate.expand(urlParams));
     url.search = stringifyQueryParams(searchParams);
     try {
       const res = await fetchWithError(url, {
@@ -1068,10 +1032,16 @@ var Clients = class extends Resource {
     path: "/{id}/authz/resource-server/policy/{type}",
     urlParamKeys: ["id", "type"]
   });
-  findOnePolicy = this.makeRequest({
+  findOnePolicyWithType = this.makeRequest({
     method: "GET",
     path: "/{id}/authz/resource-server/policy/{type}/{policyId}",
     urlParamKeys: ["id", "type", "policyId"],
+    catchNotFound: true
+  });
+  findOnePolicy = this.makeRequest({
+    method: "GET",
+    path: "/{id}/authz/resource-server/policy/{policyId}",
+    urlParamKeys: ["id", "policyId"],
     catchNotFound: true
   });
   listDependentPolicies = this.makeRequest({
@@ -2699,9 +2669,11 @@ var toBase64 = (input) => bytesToBase64(new TextEncoder().encode(input));
 var encodeRFC3986URIComponent = (input) => encodeURIComponent(input).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
 var encodeFormURIComponent = (data) => encodeRFC3986URIComponent(data).replaceAll("%20", "+");
 var getToken = async (settings) => {
-  const baseUrl = settings.baseUrl || defaultBaseUrl;
-  const realmName = settings.realmName || defaultRealm;
-  const url = `${baseUrl}/realms/${realmName}/protocol/openid-connect/token`;
+  const url = new URL(settings.baseUrl ?? defaultBaseUrl);
+  const pathTemplate = parseTemplate("/realms/{realmName}/protocol/openid-connect/token");
+  url.pathname = joinPath(url.pathname, pathTemplate.expand({
+    realmName: settings.realmName ?? defaultRealm
+  }));
   const credentials = settings.credentials || {};
   const payload = stringifyQueryParams({
     username: credentials.username,

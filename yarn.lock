@@ -117,13 +117,12 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.20.2.tgz#9c907b21e30a52db959ba4f80bb01a0cc403d5cc"
   integrity sha512-N49X4lJX27+l9jbLKSqZ6bKNjzQvHaT8IIFUy+YIqmXQdjYCToGWwOItDrfby14c78aDd5NHQl29xingXfCdLQ==
 
-"@keycloak/keycloak-admin-client@26.4.1":
-  version "26.4.1"
-  resolved "https://registry.yarnpkg.com/@keycloak/keycloak-admin-client/-/keycloak-admin-client-26.4.1.tgz#cda5fbc0784fa40d138e0a98dcf6614854fd1a7e"
-  integrity sha512-xJkU4eNkVaHBolNMnR5lWWEX3nXBjGUJblGnRSOpzn4QKr3HDu67s590a7db4CCQYHzyTj21kuD/i6DqNTxXbQ==
+"@keycloak/keycloak-admin-client@26.4.6":
+  version "26.4.6"
+  resolved "https://registry.yarnpkg.com/@keycloak/keycloak-admin-client/-/keycloak-admin-client-26.4.6.tgz#c871df6ad6921daaa4c28c8260b736924c5c3b07"
+  integrity sha512-nR58fuft1BpFJGKoV67SN1uu6V26AvCv59GpuWQW7dh+/devugMTe7kjih67MFuxL9Id7woznJyTbICdqsDl6w==
   dependencies:
     camelize-ts "^3.0.0"
-    url-join "^5.0.0"
     url-template "^3.1.1"
 
 camelize-ts@^3.0.0:
@@ -159,11 +158,6 @@ esbuild@^0.20.0:
     "@esbuild/win32-arm64" "0.20.2"
     "@esbuild/win32-ia32" "0.20.2"
     "@esbuild/win32-x64" "0.20.2"
-
-url-join@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/url-join/-/url-join-5.0.0.tgz#c2f1e5cbd95fa91082a93b58a1f42fecb4bdbcf1"
-  integrity sha512-n2huDr9h9yzd6exQVnH/jU5mr+Pfx08LRXXZhkLLetAMESRj+anQsTAh940iMrIetKAmry9coFuZQ2jY8/p3WA==
 
 url-template@^3.1.1:
   version "3.1.1"

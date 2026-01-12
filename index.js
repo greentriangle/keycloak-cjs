@@ -329,7 +329,8 @@ var Agent = class {
       const res = await fetchWithError(url, {
         ...requestOptions,
         headers: requestHeaders,
-        method
+        method,
+        ...this.#client.timeout ? { signal: AbortSignal.timeout(this.#client.timeout) } : {}
       });
       if (returnResourceIdInLocationHeader) {
         const locationHeader = res.headers.get("location");
@@ -1716,6 +1717,10 @@ var IdentityProviders = class extends Resource {
     urlParamKeys: ["alias"],
     catchNotFound: true
   });
+  uploadCertificate = this.makeUpdateRequest({
+    method: "POST",
+    path: "/upload-certificate"
+  });
   update = this.makeUpdateRequest({
     method: "PUT",
     path: "/instances/{alias}",
@@ -2114,6 +2119,27 @@ var Organizations = class extends Resource {
     path: "/{orgId}/identity-providers/{alias}",
     urlParamKeys: ["orgId", "alias"]
   });
+  // Organization Invitations Management
+  listInvitations = this.makeRequest({
+    method: "GET",
+    path: "/{orgId}/invitations",
+    urlParamKeys: ["orgId"]
+  });
+  findInvitation = this.makeRequest({
+    method: "GET",
+    path: "/{orgId}/invitations/{invitationId}",
+    urlParamKeys: ["orgId", "invitationId"]
+  });
+  resendInvitation = this.makeRequest({
+    method: "POST",
+    path: "/{orgId}/invitations/{invitationId}/resend",
+    urlParamKeys: ["orgId", "invitationId"]
+  });
+  deleteInvitation = this.makeRequest({
+    method: "DELETE",
+    path: "/{orgId}/invitations/{invitationId}",
+    urlParamKeys: ["orgId", "invitationId"]
+  });
 };
 
 // node_modules/@keycloak/keycloak-admin-client/lib/resources/workflows.js
@@ -2131,9 +2157,28 @@ var Workflows = class extends Resource {
     method: "GET",
     path: "/"
   });
+  findOne = this.makeRequest({
+    method: "GET",
+    path: "/{id}",
+    urlParamKeys: ["id"],
+    queryParamKeys: ["includeId"],
+    catchNotFound: true
+  });
+  update = this.makeUpdateRequest({
+    method: "PUT",
+    path: "/{id}",
+    urlParamKeys: ["id"]
+  });
   create = this.makeRequest({
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     returnResourceIdInLocationHeader: { field: "id" }
+  });
+  createAsYaml = this.makeRequest({
+    method: "POST",
+    headers: { "Content-Type": "application/yaml", Accept: "application/yaml" },
+    returnResourceIdInLocationHeader: { field: "id" },
+    payloadKey: "yaml"
   });
   delById = this.makeRequest({
     method: "DELETE",
@@ -2732,12 +2777,14 @@ var KeycloakAdminClient = class {
   scope;
   accessToken;
   refreshToken;
+  timeout;
   #requestOptions;
   #globalRequestArgOptions;
   #tokenProvider;
   constructor(connectionConfig) {
     this.baseUrl = connectionConfig?.baseUrl || defaultBaseUrl;
     this.realmName = connectionConfig?.realmName || defaultRealm;
+    this.timeout = connectionConfig?.timeout;
     this.#requestOptions = connectionConfig?.requestOptions;
     this.#globalRequestArgOptions = connectionConfig?.requestArgOptions;
     this.users = new Users(this);
@@ -2764,7 +2811,10 @@ var KeycloakAdminClient = class {
       realmName: this.realmName,
       scope: this.scope,
       credentials,
-      requestOptions: this.#requestOptions
+      requestOptions: {
+        ...this.#requestOptions,
+        ...this.timeout ? { signal: AbortSignal.timeout(this.timeout) } : {}
+      }
     });
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
@@ -2810,6 +2860,13 @@ var RequiredActionAlias;
   RequiredActionAlias2["UPDATE_PASSWORD"] = "UPDATE_PASSWORD";
   RequiredActionAlias2["TERMS_AND_CONDITIONS"] = "TERMS_AND_CONDITIONS";
 })(RequiredActionAlias || (RequiredActionAlias = {}));
+
+// node_modules/@keycloak/keycloak-admin-client/lib/defs/organizationInvitationRepresentation.js
+var OrganizationInvitationStatus;
+(function(OrganizationInvitationStatus2) {
+  OrganizationInvitationStatus2["PENDING"] = "PENDING";
+  OrganizationInvitationStatus2["EXPIRED"] = "EXPIRED";
+})(OrganizationInvitationStatus || (OrganizationInvitationStatus = {}));
 
 // node_modules/@keycloak/keycloak-admin-client/lib/index.js
 var requiredAction = RequiredActionAlias;

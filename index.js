@@ -2751,7 +2751,56 @@ var getToken = async (settings) => {
   return camelize(data);
 };
 
+// node_modules/@keycloak/keycloak-admin-client/lib/utils/decode.js
+function decodeToken(token) {
+  const [, payload] = token.split(".");
+  if (typeof payload !== "string") {
+    throw new Error("Unable to decode token, payload not found.");
+  }
+  let decoded;
+  try {
+    decoded = base64UrlDecode(payload);
+  } catch (error) {
+    throw new Error("Unable to decode token, payload is not a valid Base64URL value.", { cause: error });
+  }
+  try {
+    return JSON.parse(decoded);
+  } catch (error) {
+    throw new Error("Unable to decode token, payload is not a valid JSON value.", { cause: error });
+  }
+}
+function base64UrlDecode(input) {
+  let output = input.replaceAll("-", "+").replaceAll("_", "/");
+  switch (output.length % 4) {
+    case 0:
+      break;
+    case 2:
+      output += "==";
+      break;
+    case 3:
+      output += "=";
+      break;
+    default:
+      throw new Error("Input is not of the correct length.");
+  }
+  try {
+    return b64DecodeUnicode(output);
+  } catch {
+    return atob(output);
+  }
+}
+function b64DecodeUnicode(input) {
+  return decodeURIComponent(atob(input).replace(/(.)/g, (m, p) => {
+    let code = p.charCodeAt(0).toString(16).toUpperCase();
+    if (code.length < 2) {
+      code = "0" + code;
+    }
+    return "%" + code;
+  }));
+}
+
 // node_modules/@keycloak/keycloak-admin-client/lib/client.js
+var MIN_VALIDITY = 5;
 var KeycloakAdminClient = class {
   // Resources
   users;
@@ -2781,6 +2830,9 @@ var KeycloakAdminClient = class {
   #requestOptions;
   #globalRequestArgOptions;
   #tokenProvider;
+  #accessTokenDecoded;
+  #refreshTokenDecoded;
+  #credentials;
   constructor(connectionConfig) {
     this.baseUrl = connectionConfig?.baseUrl || defaultBaseUrl;
     this.realmName = connectionConfig?.realmName || defaultRealm;
@@ -2806,7 +2858,13 @@ var KeycloakAdminClient = class {
     this.cache = new Cache(this);
   }
   async auth(credentials) {
-    const { accessToken, refreshToken } = await getToken({
+    const { accessToken, refreshToken } = await getToken(this.#getTokenSettings(credentials));
+    this.#credentials = credentials;
+    this.setAccessToken(accessToken);
+    this.setRefreshToken(refreshToken);
+  }
+  #getTokenSettings(credentials) {
+    return {
       baseUrl: this.baseUrl,
       realmName: this.realmName,
       scope: this.scope,
@@ -2815,9 +2873,7 @@ var KeycloakAdminClient = class {
         ...this.#requestOptions,
         ...this.timeout ? { signal: AbortSignal.timeout(this.timeout) } : {}
       }
-    });
-    this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
+    };
   }
   registerTokenProvider(provider) {
     if (this.#tokenProvider) {
@@ -2827,12 +2883,49 @@ var KeycloakAdminClient = class {
   }
   setAccessToken(token) {
     this.accessToken = token;
+    this.#accessTokenDecoded = decodeToken(token);
+  }
+  setRefreshToken(token) {
+    this.refreshToken = token;
+    this.#refreshTokenDecoded = decodeToken(token);
   }
   async getAccessToken() {
     if (this.#tokenProvider) {
       return this.#tokenProvider.getAccessToken();
     }
+    if (this.isTokenExpired()) {
+      await this.#refreshAccessToken();
+    }
     return this.accessToken;
+  }
+  async #refreshAccessToken() {
+    if (!this.refreshToken || !this.#credentials) {
+      throw new Error("Cannot refresh token: missing refresh token or credentials");
+    }
+    if (this.isRefreshTokenExpired()) {
+      throw new Error("Cannot refresh token: refresh token has expired");
+    }
+    const { accessToken, refreshToken } = await getToken(this.#getTokenSettings({
+      grantType: "refresh_token",
+      clientId: this.#credentials.clientId,
+      clientSecret: this.#credentials.clientSecret,
+      refreshToken: this.refreshToken
+    }));
+    this.setAccessToken(accessToken);
+    this.setRefreshToken(refreshToken);
+  }
+  isTokenExpired() {
+    return this.#isExpired(this.#accessTokenDecoded);
+  }
+  isRefreshTokenExpired() {
+    return this.#isExpired(this.#refreshTokenDecoded);
+  }
+  #isExpired(token) {
+    if (typeof token?.exp !== "number") {
+      return false;
+    }
+    const expiresIn = token.exp - Math.ceil((/* @__PURE__ */ new Date()).getTime() / 1e3) - MIN_VALIDITY;
+    return expiresIn < 0;
   }
   getRequestOptions() {
     return this.#requestOptions;

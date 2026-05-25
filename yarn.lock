@@ -117,69 +117,69 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.20.2.tgz#9c907b21e30a52db959ba4f80bb01a0cc403d5cc"
   integrity sha512-N49X4lJX27+l9jbLKSqZ6bKNjzQvHaT8IIFUy+YIqmXQdjYCToGWwOItDrfby14c78aDd5NHQl29xingXfCdLQ==
 
-"@keycloak/keycloak-admin-client@26.7.1":
-  version "26.7.1"
-  resolved "https://registry.yarnpkg.com/@keycloak/keycloak-admin-client/-/keycloak-admin-client-26.7.1.tgz#b5db3cc964339fa71072ce6e472d9e6fb6d02d21"
-  integrity sha512-jKJ+xR6SxoIDY3LjThmLGkeJJGA4LaihqieJOd/qnVIUfNMsUjmwWNOomPAEH+TUfRz6CG9yiuxxvauuM1KmIQ==
+"@keycloak/keycloak-admin-client@26.6.2":
+  version "26.6.2"
+  resolved "https://registry.yarnpkg.com/@keycloak/keycloak-admin-client/-/keycloak-admin-client-26.6.2.tgz#3c47278fe332945823efd0d18fe221bebb609c4b"
+  integrity sha512-CEqQ/fzJPkWOTM0LaUeH5KAKlCQGkqlydhpnxFM9Vx1rLyjr9AIqrENPNzt0owYDPIqrl6OYaFZJBAoH8woDpA==
   dependencies:
-    "@microsoft/kiota-abstractions" "1.0.0-preview.103"
-    "@microsoft/kiota-http-fetchlibrary" "1.0.0-preview.103"
-    "@microsoft/kiota-serialization-form" "1.0.0-preview.103"
-    "@microsoft/kiota-serialization-json" "1.0.0-preview.103"
-    "@microsoft/kiota-serialization-multipart" "1.0.0-preview.103"
-    "@microsoft/kiota-serialization-text" "1.0.0-preview.103"
+    "@microsoft/kiota-abstractions" "^1.0.0-preview.86"
+    "@microsoft/kiota-http-fetchlibrary" "^1.0.0-preview.80"
+    "@microsoft/kiota-serialization-form" "^1.0.0-preview.74"
+    "@microsoft/kiota-serialization-json" "^1.0.0-preview.86"
+    "@microsoft/kiota-serialization-multipart" "^1.0.0-preview.67"
+    "@microsoft/kiota-serialization-text" "^1.0.0-preview.79"
     camelize-ts "^3.0.0"
     url-template "^3.1.1"
 
-"@microsoft/kiota-abstractions@1.0.0-preview.103", "@microsoft/kiota-abstractions@^1.0.0-preview.103":
-  version "1.0.0-preview.103"
-  resolved "https://registry.yarnpkg.com/@microsoft/kiota-abstractions/-/kiota-abstractions-1.0.0-preview.103.tgz#66f48c5c63589b7d98646f1fd0cce3f24f9df642"
-  integrity sha512-om7nKH8nWyEAQ0lgbIdKdrkmznhkdDJdliCnAIo31X/hlUah1aBzvfUx+pbyp67Q040yLK+2J6P7AnvGSoN/qQ==
+"@microsoft/kiota-abstractions@^1.0.0-preview.100", "@microsoft/kiota-abstractions@^1.0.0-preview.86":
+  version "1.0.0-preview.100"
+  resolved "https://registry.yarnpkg.com/@microsoft/kiota-abstractions/-/kiota-abstractions-1.0.0-preview.100.tgz#435ab779394080e581794d98d78407db9ec806a2"
+  integrity sha512-3s2WYKQ6WLB/0pyDmmv9bigH/3LZ0Mm4ldHskNLBj0U8DYjFzfG729snnEij+hZN0l2XHr37pGBr1MZK8vM7zQ==
   dependencies:
     "@opentelemetry/api" "^1.7.0"
     "@std-uritemplate/std-uritemplate" "^2.0.0"
     tinyduration "^3.3.0"
     tslib "^2.6.2"
 
-"@microsoft/kiota-http-fetchlibrary@1.0.0-preview.103":
-  version "1.0.0-preview.103"
-  resolved "https://registry.yarnpkg.com/@microsoft/kiota-http-fetchlibrary/-/kiota-http-fetchlibrary-1.0.0-preview.103.tgz#2233aae58653e207e2a01da864bc3a406f41872e"
-  integrity sha512-DbhGL+pdVjtv2AVvxB4fxvNC/GMzKbYyeQsknaXJXwqnPR/oIClWjaXlIxWL5SBK72DOmrZ18leaWMB2vfWvpw==
+"@microsoft/kiota-http-fetchlibrary@^1.0.0-preview.80":
+  version "1.0.0-preview.100"
+  resolved "https://registry.yarnpkg.com/@microsoft/kiota-http-fetchlibrary/-/kiota-http-fetchlibrary-1.0.0-preview.100.tgz#73dcea0c43d0bf9644805df3a870378692f69ca1"
+  integrity sha512-uS2rhKKjbYiT8JWG8GGVOALB+s4HdDc9hg5tTZMVf3qY5b/us1OKLQ6WgW6USq/kZAuKKWkIq/BQgPCWbHtFTQ==
   dependencies:
-    "@microsoft/kiota-abstractions" "^1.0.0-preview.103"
+    "@microsoft/kiota-abstractions" "^1.0.0-preview.100"
     "@opentelemetry/api" "^1.7.0"
     tslib "^2.6.2"
 
-"@microsoft/kiota-serialization-form@1.0.0-preview.103":
-  version "1.0.0-preview.103"
-  resolved "https://registry.yarnpkg.com/@microsoft/kiota-serialization-form/-/kiota-serialization-form-1.0.0-preview.103.tgz#0efa3786b2edc3532d0030e70c5d3ae2f9761468"
-  integrity sha512-AD5Q59Qu61DfhaLLN7Mvgx4Zw0Zmftqx04XAbrRreC+r9hwT1BqTf0EReCraMzEoC4sdrp/8haI2Arm8dWUWuQ==
+"@microsoft/kiota-serialization-form@^1.0.0-preview.74":
+  version "1.0.0-preview.100"
+  resolved "https://registry.yarnpkg.com/@microsoft/kiota-serialization-form/-/kiota-serialization-form-1.0.0-preview.100.tgz#0b32fd1d6c12b8f59a8d3a3eaf3523a7c6cc932c"
+  integrity sha512-SR/yWBtvKYhN2ARR4wVMFb91XgN32DBmLLQmtemdKgL1YWBxVCNAUP/qHbZhrTX7q4kh7jl/S9yrr1S8ySS7AA==
   dependencies:
-    "@microsoft/kiota-abstractions" "^1.0.0-preview.103"
+    "@microsoft/kiota-abstractions" "^1.0.0-preview.100"
     tslib "^2.6.2"
 
-"@microsoft/kiota-serialization-json@1.0.0-preview.103":
-  version "1.0.0-preview.103"
-  resolved "https://registry.yarnpkg.com/@microsoft/kiota-serialization-json/-/kiota-serialization-json-1.0.0-preview.103.tgz#130322184838b1d6da907a1a212b4c4c6a4a2bcc"
-  integrity sha512-dTr8q6H42TSe+HaCPBXU4Pv6ypo7MjMGRo/r9GRbnCuy8VCWfe+Vh38rnAZJx4r8cmvOUD7Yw74IJ6q4Hjv3mg==
+"@microsoft/kiota-serialization-json@^1.0.0-preview.86":
+  version "1.0.0-preview.100"
+  resolved "https://registry.yarnpkg.com/@microsoft/kiota-serialization-json/-/kiota-serialization-json-1.0.0-preview.100.tgz#41f953ed14d0ff261a3e082ea0d080676a43f1ab"
+  integrity sha512-4qatf5j0Aeaakdw24jMuIX7W6mf/W2rU9UyAjkIrSjaB7W5n8gsUvhoTcRpPTAFN7pvzQkCbO7Z0paRfdYzhIw==
   dependencies:
-    "@microsoft/kiota-abstractions" "^1.0.0-preview.103"
+    "@microsoft/kiota-abstractions" "^1.0.0-preview.100"
     tslib "^2.6.2"
 
-"@microsoft/kiota-serialization-multipart@1.0.0-preview.103":
-  version "1.0.0-preview.103"
-  resolved "https://registry.yarnpkg.com/@microsoft/kiota-serialization-multipart/-/kiota-serialization-multipart-1.0.0-preview.103.tgz#c7d2d9cb169c663bebf42057be1f9f3b7e43ec04"
-  integrity sha512-b3ePXYgFv/2TQtbzFQ8ZY+hzMtCRkz4Cx5y/Pf8vtoQu56KU0/9rYq5kA9wySDdCx/oZxfubQQRV/8QSTxmejw==
+"@microsoft/kiota-serialization-multipart@^1.0.0-preview.67":
+  version "1.0.0-preview.100"
+  resolved "https://registry.yarnpkg.com/@microsoft/kiota-serialization-multipart/-/kiota-serialization-multipart-1.0.0-preview.100.tgz#9b1118ead703d479f778a671700a153e31fa005c"
+  integrity sha512-zwWoLZH6+KsAl05Ijd8HpbU+mct5wb0//ZCGdCkQ/UqsAaoe2xYSoKicxQbVGv9VvSTq0as7iVLwqDeqEI9rDw==
   dependencies:
-    "@microsoft/kiota-abstractions" "^1.0.0-preview.103"
+    "@microsoft/kiota-abstractions" "^1.0.0-preview.100"
     tslib "^2.6.2"
 
-"@microsoft/kiota-serialization-text@1.0.0-preview.103":
-  version "1.0.0-preview.103"
-  resolved "https://registry.yarnpkg.com/@microsoft/kiota-serialization-text/-/kiota-serialization-text-1.0.0-preview.103.tgz#dbd15b0e3536e02b1763919cbac45eb9622c58ae"
-  integrity sha512-FkiboqpNtT2F40xUC9LETHK9ckHd+WuocLJE70ljI4EYvD59MQDsrTERYAwbmkfPIJ6JRE4OfLXFVh510LG1/Q==
+"@microsoft/kiota-serialization-text@^1.0.0-preview.79":
+  version "1.0.0-preview.100"
+  resolved "https://registry.yarnpkg.com/@microsoft/kiota-serialization-text/-/kiota-serialization-text-1.0.0-preview.100.tgz#aab658740e51c2c87da570319aa4fac10400b6a6"
+  integrity sha512-x2Epz0StHLBkVJKeEmwrXSh6SJuxZ72VVBNO53uHUNZ/Y7X8tZuSQR7X74EO69mEi4zAF21X2jbkF9/dhlARog==
   dependencies:
-    "@microsoft/kiota-abstractions" "^1.0.0-preview.103"
+    "@microsoft/kiota-abstractions" "^1.0.0-preview.100"
     tslib "^2.6.2"
 
 "@opentelemetry/api@^1.7.0":

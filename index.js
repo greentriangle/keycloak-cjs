@@ -274,6 +274,7 @@ async function fetchWithError(input, init) {
   if (!response.ok) {
     const responseData = await parseResponse(response);
     const message = getErrorMessage(responseData);
+    console.error(message, response.status, responseData);
     throw new NetworkError(message, {
       response,
       responseData
@@ -391,7 +392,7 @@ var Agent = class {
   updateRequest({ method, path = "", urlParamKeys = [], queryParamKeys = [], catchNotFound = false, keyTransform, payloadKey, returnResourceIdInLocationHeader, headers }) {
     return async (query = {}, payload = {}) => {
       const baseParams = this.#getBaseParams?.() ?? {};
-      const queryParams = queryParamKeys.length > 0 ? pick(query, queryParamKeys) : void 0;
+      const queryParams = queryParamKeys ? pick(query, queryParamKeys) : void 0;
       const allUrlParamKeys = [...Object.keys(baseParams), ...urlParamKeys];
       const urlParams = {
         ...baseParams,
@@ -475,9 +476,9 @@ var Agent = class {
     if (!payload) {
       return;
     }
-    Object.keys(keyMapping).forEach((key) => {
+    Object.keys(keyMapping).some((key) => {
       if (typeof payload[key] === "undefined") {
-        return;
+        return false;
       }
       const newKey = keyMapping[key];
       payload[newKey] = payload[key];
@@ -3988,27 +3989,24 @@ var FetchRequestAdapter = class _FetchRequestAdapter {
               case "number":
               case "boolean":
               case "Date":
-              case "Duration":
-              case "DateOnly":
-              case "TimeOnly":
                 const rootNode = await this.getRootParseNode(response);
                 return trace.getTracer(this.observabilityOptions.getTracerInstrumentationName()).startActiveSpan(`getCollectionOf${responseType}Value`, (deserializeSpan) => {
                   try {
                     span.setAttribute(_FetchRequestAdapter.responseTypeAttributeKey, responseType);
                     if (responseType === "string") {
-                      return rootNode.getCollectionOfPrimitiveValues(responseType);
+                      return rootNode.getCollectionOfPrimitiveValues();
                     } else if (responseType === "number") {
-                      return rootNode.getCollectionOfPrimitiveValues(responseType);
+                      return rootNode.getCollectionOfPrimitiveValues();
                     } else if (responseType === "boolean") {
-                      return rootNode.getCollectionOfPrimitiveValues(responseType);
+                      return rootNode.getCollectionOfPrimitiveValues();
                     } else if (responseType === "Date") {
-                      return rootNode.getCollectionOfPrimitiveValues(responseType);
+                      return rootNode.getCollectionOfPrimitiveValues();
                     } else if (responseType === "Duration") {
-                      return rootNode.getCollectionOfPrimitiveValues(responseType);
+                      return rootNode.getCollectionOfPrimitiveValues();
                     } else if (responseType === "DateOnly") {
-                      return rootNode.getCollectionOfPrimitiveValues(responseType);
+                      return rootNode.getCollectionOfPrimitiveValues();
                     } else if (responseType === "TimeOnly") {
-                      return rootNode.getCollectionOfPrimitiveValues(responseType);
+                      return rootNode.getCollectionOfPrimitiveValues();
                     } else {
                       throw new Error("unexpected type to deserialize");
                     }
@@ -5203,12 +5201,8 @@ RedirectHandlerOptions.defaultScrubSensitiveHeaders = (headers, originalUrl, new
     const newUri = new URL(newUrl);
     const isDifferentHostOrScheme = originalUri.host.toLowerCase() !== newUri.host.toLowerCase() || originalUri.protocol.toLowerCase() !== newUri.protocol.toLowerCase();
     if (isDifferentHostOrScheme) {
-      for (const key of Object.keys(headers)) {
-        const lower = key.toLowerCase();
-        if (lower === "authorization" || lower === "cookie" || lower === "proxy-authorization") {
-          delete headers[key];
-        }
-      }
+      delete headers.Authorization;
+      delete headers.Cookie;
     }
   } catch (_a2) {
     return;
@@ -5803,9 +5797,6 @@ function deserializeIntoBaseClientRepresentation(baseClientRepresentation = {}) 
     "clientId": (n) => {
       baseClientRepresentation.clientId = n.getStringValue();
     },
-    "createdTimestamp": (n) => {
-      baseClientRepresentation.createdTimestamp = n.getNumberValue();
-    },
     "description": (n) => {
       baseClientRepresentation.description = n.getStringValue();
     },
@@ -5819,13 +5810,10 @@ function deserializeIntoBaseClientRepresentation(baseClientRepresentation = {}) 
       baseClientRepresentation.protocol = n.getStringValue();
     },
     "redirectUris": (n) => {
-      baseClientRepresentation.redirectUris = n.getCollectionOfPrimitiveValues("string");
+      baseClientRepresentation.redirectUris = n.getCollectionOfPrimitiveValues();
     },
     "roles": (n) => {
-      baseClientRepresentation.roles = n.getCollectionOfPrimitiveValues("string");
-    },
-    "updatedTimestamp": (n) => {
-      baseClientRepresentation.updatedTimestamp = n.getNumberValue();
+      baseClientRepresentation.roles = n.getCollectionOfPrimitiveValues();
     },
     "uuid": (n) => {
       baseClientRepresentation.uuid = n.getStringValue();
@@ -5842,10 +5830,10 @@ function deserializeIntoOIDCClientRepresentation(oIDCClientRepresentation = {}) 
       oIDCClientRepresentation.loginFlows = n.getCollectionOfEnumValues(FlowObject);
     },
     "serviceAccountRoles": (n) => {
-      oIDCClientRepresentation.serviceAccountRoles = n.getCollectionOfPrimitiveValues("string");
+      oIDCClientRepresentation.serviceAccountRoles = n.getCollectionOfPrimitiveValues();
     },
     "webOrigins": (n) => {
-      oIDCClientRepresentation.webOrigins = n.getCollectionOfPrimitiveValues("string");
+      oIDCClientRepresentation.webOrigins = n.getCollectionOfPrimitiveValues();
     }
   };
 }
@@ -5871,13 +5859,13 @@ function deserializeIntoSAMLClientRepresentation(sAMLClientRepresentation = {}) 
       sAMLClientRepresentation.includeAuthnStatement = n.getBooleanValue();
     },
     "nameIdFormat": (n) => {
-      sAMLClientRepresentation.nameIdFormat = n.getEnumValue(NameIdFormatObject);
+      sAMLClientRepresentation.nameIdFormat = n.getStringValue();
     },
     "signAssertions": (n) => {
       sAMLClientRepresentation.signAssertions = n.getBooleanValue();
     },
     "signatureAlgorithm": (n) => {
-      sAMLClientRepresentation.signatureAlgorithm = n.getEnumValue(SignatureAlgorithmObject);
+      sAMLClientRepresentation.signatureAlgorithm = n.getStringValue();
     },
     "signatureCanonicalizationMethod": (n) => {
       sAMLClientRepresentation.signatureCanonicalizationMethod = n.getStringValue();
@@ -5943,9 +5931,9 @@ function serializeSAMLClientRepresentation(writer, sAMLClientRepresentation = {}
   writer.writeBooleanValue("forcePostBinding", sAMLClientRepresentation.forcePostBinding);
   writer.writeBooleanValue("frontChannelLogout", sAMLClientRepresentation.frontChannelLogout);
   writer.writeBooleanValue("includeAuthnStatement", sAMLClientRepresentation.includeAuthnStatement);
-  writer.writeEnumValue("nameIdFormat", sAMLClientRepresentation.nameIdFormat);
+  writer.writeStringValue("nameIdFormat", sAMLClientRepresentation.nameIdFormat);
   writer.writeBooleanValue("signAssertions", sAMLClientRepresentation.signAssertions);
-  writer.writeEnumValue("signatureAlgorithm", sAMLClientRepresentation.signatureAlgorithm);
+  writer.writeStringValue("signatureAlgorithm", sAMLClientRepresentation.signatureAlgorithm);
   writer.writeStringValue("signatureCanonicalizationMethod", sAMLClientRepresentation.signatureCanonicalizationMethod);
   writer.writeBooleanValue("signDocuments", sAMLClientRepresentation.signDocuments);
   writer.writeStringValue("signingCertificate", sAMLClientRepresentation.signingCertificate);
@@ -5959,51 +5947,30 @@ var FlowObject = {
   DEVICE: "DEVICE",
   CIBA: "CIBA"
 };
-var NameIdFormatObject = {
-  Username: "username",
-  Email: "email",
-  Persistent: "persistent",
-  Transient: "transient"
-};
-var SignatureAlgorithmObject = {
-  RSA_SHA1: "RSA_SHA1",
-  RSA_SHA256: "RSA_SHA256",
-  RSA_SHA256_MGF1: "RSA_SHA256_MGF1",
-  RSA_SHA512: "RSA_SHA512",
-  RSA_SHA512_MGF1: "RSA_SHA512_MGF1",
-  DSA_SHA1: "DSA_SHA1"
-};
 
-// node_modules/@keycloak/keycloak-admin-client/lib/generated/admin/api/item/clients/v2/item/index.js
-function serializeV2PatchRequestBody(writer, v2PatchRequestBody = {}, isSerializingDerivedType = false) {
-  if (!v2PatchRequestBody || isSerializingDerivedType) {
-    return;
-  }
-  writer.writeAdditionalData(v2PatchRequestBody.additionalData);
-}
-var V2ItemRequestBuilderUriTemplate = "{+baseurl}/admin/api/{realmName}/clients/v2/{id}";
-var V2ItemRequestBuilderRequestsMetadata = {
+// node_modules/@keycloak/keycloak-admin-client/lib/generated/admin/api/item/clients/item/item/index.js
+var VersionItemRequestBuilderUriTemplate = "{+baseurl}/admin/api/{realmName}/clients/{version}/{id}";
+var VersionItemRequestBuilderRequestsMetadata = {
   delete: {
-    uriTemplate: V2ItemRequestBuilderUriTemplate,
+    uriTemplate: VersionItemRequestBuilderUriTemplate,
     adapterMethodName: "sendNoResponseContent"
   },
   get: {
-    uriTemplate: V2ItemRequestBuilderUriTemplate,
+    uriTemplate: VersionItemRequestBuilderUriTemplate,
     responseBodyContentType: "application/json",
     adapterMethodName: "send",
     responseBodyFactory: createBaseClientRepresentationFromDiscriminatorValue
   },
   patch: {
-    uriTemplate: V2ItemRequestBuilderUriTemplate,
+    uriTemplate: VersionItemRequestBuilderUriTemplate,
     responseBodyContentType: "application/json",
     adapterMethodName: "send",
     responseBodyFactory: createBaseClientRepresentationFromDiscriminatorValue,
     requestBodyContentType: "application/merge-patch+json",
-    requestBodySerializer: serializeV2PatchRequestBody,
-    requestInformationContentSetMethod: "setContentFromParsable"
+    requestInformationContentSetMethod: "setStreamContent"
   },
   put: {
-    uriTemplate: V2ItemRequestBuilderUriTemplate,
+    uriTemplate: VersionItemRequestBuilderUriTemplate,
     responseBodyContentType: "application/json",
     adapterMethodName: "send",
     responseBodyFactory: createBaseClientRepresentationFromDiscriminatorValue,
@@ -6013,23 +5980,23 @@ var V2ItemRequestBuilderRequestsMetadata = {
   }
 };
 
-// node_modules/@keycloak/keycloak-admin-client/lib/generated/admin/api/item/clients/v2/index.js
-var V2RequestBuilderUriTemplate = "{+baseurl}/admin/api/{realmName}/clients/v2{?fields,limit*,offset*,q*,sort*}";
-var V2RequestBuilderNavigationMetadata = {
+// node_modules/@keycloak/keycloak-admin-client/lib/generated/admin/api/item/clients/item/index.js
+var WithVersionItemRequestBuilderUriTemplate = "{+baseurl}/admin/api/{realmName}/clients/{version}";
+var WithVersionItemRequestBuilderNavigationMetadata = {
   byId: {
-    requestsMetadata: V2ItemRequestBuilderRequestsMetadata,
+    requestsMetadata: VersionItemRequestBuilderRequestsMetadata,
     pathParametersMappings: ["id"]
   }
 };
-var V2RequestBuilderRequestsMetadata = {
+var WithVersionItemRequestBuilderRequestsMetadata = {
   get: {
-    uriTemplate: V2RequestBuilderUriTemplate,
+    uriTemplate: WithVersionItemRequestBuilderUriTemplate,
     responseBodyContentType: "application/json",
     adapterMethodName: "sendCollection",
     responseBodyFactory: createBaseClientRepresentationFromDiscriminatorValue
   },
   post: {
-    uriTemplate: V2RequestBuilderUriTemplate,
+    uriTemplate: WithVersionItemRequestBuilderUriTemplate,
     responseBodyContentType: "application/json",
     adapterMethodName: "send",
     responseBodyFactory: createBaseClientRepresentationFromDiscriminatorValue,
@@ -6041,9 +6008,10 @@ var V2RequestBuilderRequestsMetadata = {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/generated/admin/api/item/clients/index.js
 var ClientsRequestBuilderNavigationMetadata = {
-  v2: {
-    requestsMetadata: V2RequestBuilderRequestsMetadata,
-    navigationMetadata: V2RequestBuilderNavigationMetadata
+  byVersion: {
+    requestsMetadata: WithVersionItemRequestBuilderRequestsMetadata,
+    navigationMetadata: WithVersionItemRequestBuilderNavigationMetadata,
+    pathParametersMappings: ["version"]
   }
 };
 
@@ -6080,40 +6048,50 @@ var FormParseNode = class _FormParseNode {
     this._rawString = _rawString;
     this.backingStoreFactory = backingStoreFactory;
     this._fields = {};
-    this.getStringValue = () => this.getStringValueFromRaw(this._rawString);
+    this.normalizeKey = (key) => decodeURIComponent(key).trim();
+    this.getStringValue = () => decodeURIComponent(this._rawString);
     this.getChildNode = (identifier) => {
       if (this._fields[identifier]) {
         return new _FormParseNode(this._fields[identifier], this.backingStoreFactory);
       }
       return void 0;
     };
-    this.getBooleanValue = () => this.getBooleanValueFromRaw(this._rawString);
-    this.getNumberValue = () => this.getNumberValueFromRaw(this._rawString);
-    this.getGuidValue = () => this.getGuidValueFromRaw(this._rawString);
-    this.getDateValue = () => this.getDateValueFromRaw(this._rawString);
-    this.getDateOnlyValue = () => this.getDateOnlyValueFromRaw(this._rawString);
-    this.getTimeOnlyValue = () => this.getTimeOnlyValueFromRaw(this._rawString);
-    this.getDurationValue = () => this.getDurationValueFromRaw(this._rawString);
-    this.getCollectionOfPrimitiveValues = (primitiveType) => {
-      const values = this._rawString.split(",");
-      return values.map((x) => {
-        switch (primitiveType) {
-          case "boolean":
-            return this.getBooleanValueFromRaw(x);
-          case "number":
-            return this.getNumberValueFromRaw(x);
-          case "Date":
-            return this.getDateValueFromRaw(x);
-          case "DateOnly":
-            return this.getDateOnlyValueFromRaw(x);
-          case "TimeOnly":
-            return this.getTimeOnlyValueFromRaw(x);
-          case "Duration":
-            return this.getDurationValueFromRaw(x);
-          case "string":
-            return this.getStringValueFromRaw(x);
-          default:
-            throw new Error(`encountered an unsupported type during deserialization ${primitiveType}`);
+    this.getBooleanValue = () => {
+      var _a2;
+      const value = (_a2 = this.getStringValue()) === null || _a2 === void 0 ? void 0 : _a2.toLowerCase();
+      if (value === "true" || value === "1") {
+        return true;
+      } else if (value === "false" || value === "0") {
+        return false;
+      }
+      return void 0;
+    };
+    this.getNumberValue = () => parseFloat(this.getStringValue());
+    this.getGuidValue = () => parseGuidString(this.getStringValue());
+    this.getDateValue = () => new Date(Date.parse(this.getStringValue()));
+    this.getDateOnlyValue = () => DateOnly.parse(this.getStringValue());
+    this.getTimeOnlyValue = () => TimeOnly.parse(this.getStringValue());
+    this.getDurationValue = () => Duration.parse(this.getStringValue());
+    this.getCollectionOfPrimitiveValues = () => {
+      return this._rawString.split(",").map((x) => {
+        const currentParseNode = new _FormParseNode(x, this.backingStoreFactory);
+        const typeOfX = typeof x;
+        if (typeOfX === "boolean") {
+          return currentParseNode.getBooleanValue();
+        } else if (typeOfX === "string") {
+          return currentParseNode.getStringValue();
+        } else if (typeOfX === "number") {
+          return currentParseNode.getNumberValue();
+        } else if (x instanceof Date) {
+          return currentParseNode.getDateValue();
+        } else if (x instanceof DateOnly) {
+          return currentParseNode.getDateValue();
+        } else if (x instanceof TimeOnly) {
+          return currentParseNode.getDateValue();
+        } else if (x instanceof Duration) {
+          return currentParseNode.getDateValue();
+        } else {
+          throw new Error(`encountered an unknown type during deserialization ${typeof x}`);
         }
       });
     };
@@ -6147,6 +6125,17 @@ var FormParseNode = class _FormParseNode {
       }
       return getEnumValueFromStringValue(rawValue, type);
     };
+    this.assignFieldValues = (model, parsableFactory) => {
+      const fields = parsableFactory(this)(model);
+      Object.entries(this._fields).filter((x) => !/^null$/i.test(x[1])).forEach(([k, v]) => {
+        const deserializer = fields[k];
+        if (deserializer) {
+          deserializer(new _FormParseNode(v, this.backingStoreFactory));
+        } else {
+          model[k] = v;
+        }
+      });
+    };
     if (!_rawString) {
       throw new Error("rawString cannot be undefined");
     }
@@ -6159,52 +6148,8 @@ var FormParseNode = class _FormParseNode {
       }
     });
   }
-  normalizeKey(key) {
-    return decodeURIComponent(key).trim();
-  }
-  getStringValueFromRaw(value) {
-    return decodeURIComponent(value);
-  }
-  getBooleanValueFromRaw(value) {
-    const decoded = this.getStringValueFromRaw(value).toLowerCase();
-    if (decoded === "true" || decoded === "1") {
-      return true;
-    } else if (decoded === "false" || decoded === "0") {
-      return false;
-    }
-    return void 0;
-  }
-  getNumberValueFromRaw(value) {
-    return parseFloat(this.getStringValueFromRaw(value));
-  }
-  getGuidValueFromRaw(value) {
-    return parseGuidString(this.getStringValueFromRaw(value));
-  }
-  getDateValueFromRaw(value) {
-    return new Date(Date.parse(this.getStringValueFromRaw(value)));
-  }
-  getDateOnlyValueFromRaw(value) {
-    return DateOnly.parse(this.getStringValueFromRaw(value));
-  }
-  getTimeOnlyValueFromRaw(value) {
-    return TimeOnly.parse(this.getStringValueFromRaw(value));
-  }
-  getDurationValueFromRaw(value) {
-    return Duration.parse(this.getStringValueFromRaw(value));
-  }
   getByteArrayValue() {
     throw new Error("serialization of byt arrays is not supported with URI encoding");
-  }
-  assignFieldValues(model, parsableFactory) {
-    const fields = parsableFactory(this)(model);
-    Object.entries(this._fields).filter((x) => !/^null$/i.test(x[1])).forEach(([k, v]) => {
-      const deserializer = fields[k];
-      if (deserializer) {
-        deserializer(new _FormParseNode(v, this.backingStoreFactory));
-      } else {
-        model[k] = v;
-      }
-    });
   }
 };
 
@@ -6419,52 +6364,42 @@ var JsonParseNode = class _JsonParseNode {
   constructor(_jsonNode, backingStoreFactory) {
     this._jsonNode = _jsonNode;
     this.backingStoreFactory = backingStoreFactory;
-    this.getStringValue = () => this.getStringValueFromRaw(this._jsonNode);
+    this.getStringValue = () => typeof this._jsonNode === "string" ? this._jsonNode : void 0;
     this.getChildNode = (identifier) => this._jsonNode && typeof this._jsonNode === "object" && this._jsonNode[identifier] !== void 0 ? new _JsonParseNode(this._jsonNode[identifier], this.backingStoreFactory) : void 0;
     this.getBooleanValue = () => typeof this._jsonNode === "boolean" ? this._jsonNode : void 0;
     this.getNumberValue = () => typeof this._jsonNode === "number" ? this._jsonNode : void 0;
-    this.getGuidValue = () => this.getGuidValueFromRaw(this._jsonNode);
-    this.getDateValue = () => this.getDateValueFromRaw(this._jsonNode);
-    this.getDateOnlyValue = () => this.getDateOnlyValueFromRaw(this._jsonNode);
-    this.getTimeOnlyValue = () => this.getTimeOnlyValueFromRaw(this._jsonNode);
-    this.getDurationValue = () => this.getDurationValueFromRaw(this._jsonNode);
-    this.getCollectionOfPrimitiveValues = (primitiveType) => {
+    this.getGuidValue = () => parseGuidString(this.getStringValue());
+    this.getDateValue = () => this._jsonNode ? new Date(this._jsonNode) : void 0;
+    this.getDateOnlyValue = () => DateOnly.parse(this.getStringValue());
+    this.getTimeOnlyValue = () => TimeOnly.parse(this.getStringValue());
+    this.getDurationValue = () => Duration.parse(this.getStringValue());
+    this.getCollectionOfPrimitiveValues = () => {
       if (!Array.isArray(this._jsonNode)) {
         return void 0;
       }
-      return this._jsonNode.map((x) => this.getPrimitiveValue(x, primitiveType));
-    };
-    this.getPrimitiveValue = (value, primitiveType) => {
-      if (value === null) {
-        return null;
-      }
-      switch (primitiveType) {
-        case "boolean":
-          if (typeof value !== "boolean") {
-            throw new Error(`encountered an unsupported type during deserialization ${typeof value}`);
-          }
-          return value;
-        case "number":
-          if (typeof value !== "number") {
-            throw new Error(`encountered an unsupported type during deserialization ${typeof value}`);
-          }
-          return value;
-        case "Date":
-          return this.getDateValueFromRaw(value);
-        case "DateOnly":
-          return this.getDateOnlyValueFromRaw(value);
-        case "TimeOnly":
-          return this.getTimeOnlyValueFromRaw(value);
-        case "Duration":
-          return this.getDurationValueFromRaw(value);
-        case "string":
-          if (typeof value !== "string") {
-            throw new Error(`encountered an unsupported type during deserialization ${typeof value}`);
-          }
-          return value;
-        default:
-          throw new Error(`encountered an unsupported type during deserialization ${primitiveType}`);
-      }
+      return this._jsonNode.map((x) => {
+        const currentParseNode = new _JsonParseNode(x, this.backingStoreFactory);
+        const typeOfX = typeof x;
+        if (x === null) {
+          return null;
+        } else if (typeOfX === "boolean") {
+          return currentParseNode.getBooleanValue();
+        } else if (typeOfX === "string") {
+          return currentParseNode.getStringValue();
+        } else if (typeOfX === "number") {
+          return currentParseNode.getNumberValue();
+        } else if (x instanceof Date) {
+          return currentParseNode.getDateValue();
+        } else if (x instanceof DateOnly) {
+          return currentParseNode.getDateValue();
+        } else if (x instanceof TimeOnly) {
+          return currentParseNode.getDateValue();
+        } else if (x instanceof Duration) {
+          return currentParseNode.getDateValue();
+        } else {
+          throw new Error(`encountered an unknown type during deserialization ${typeof x}`);
+        }
+      });
     };
     this.getCollectionOfObjectValues = (method) => {
       if (!Array.isArray(this._jsonNode)) {
@@ -6530,11 +6465,9 @@ var JsonParseNode = class _JsonParseNode {
     this.getCollectionOfEnumValues = (type) => {
       if (Array.isArray(this._jsonNode)) {
         return this._jsonNode.map((x) => {
-          if (typeof x === "string") {
-            return getEnumValueFromStringValue(x, type);
-          }
-          return void 0;
-        }).filter((value) => value !== void 0);
+          const node = new _JsonParseNode(x, this.backingStoreFactory);
+          return node.getEnumValue(type);
+        }).filter(Boolean);
       }
       return [];
     };
@@ -6545,33 +6478,6 @@ var JsonParseNode = class _JsonParseNode {
       }
       return getEnumValueFromStringValue(rawValue, type);
     };
-  }
-  getStringValueFromRaw(value) {
-    return typeof value === "string" ? value : void 0;
-  }
-  getGuidValueFromRaw(value) {
-    return parseGuidString(this.getStringValueFromRaw(value));
-  }
-  getDateValueFromRaw(value) {
-    if (value instanceof Date) {
-      return new Date(value.getTime());
-    }
-    if (typeof value === "number") {
-      return new Date(value);
-    }
-    if (typeof value === "string") {
-      return new Date(value);
-    }
-    return void 0;
-  }
-  getDateOnlyValueFromRaw(value) {
-    return value instanceof DateOnly ? value : DateOnly.parse(this.getStringValueFromRaw(value));
-  }
-  getTimeOnlyValueFromRaw(value) {
-    return value instanceof TimeOnly ? value : TimeOnly.parse(this.getStringValueFromRaw(value));
-  }
-  getDurationValueFromRaw(value) {
-    return value instanceof Duration ? value : Duration.parse(this.getStringValueFromRaw(value));
   }
   getByteArrayValue() {
     const strValue = this.getStringValue();
@@ -7016,28 +6922,8 @@ var TextParseNode = class _TextParseNode {
     this.getDateOnlyValue = () => DateOnly.parse(this.getStringValue());
     this.getTimeOnlyValue = () => TimeOnly.parse(this.getStringValue());
     this.getDurationValue = () => Duration.parse(this.getStringValue());
-    this.getCollectionOfPrimitiveValues = (primitiveType) => {
-      return this.text.split(",").map((x) => {
-        const node = new _TextParseNode(x);
-        switch (primitiveType) {
-          case "boolean":
-            return node.getBooleanValue();
-          case "number":
-            return node.getNumberValue();
-          case "Date":
-            return node.getDateValue();
-          case "DateOnly":
-            return node.getDateOnlyValue();
-          case "TimeOnly":
-            return node.getTimeOnlyValue();
-          case "Duration":
-            return node.getDurationValue();
-          case "string":
-            return node.getStringValue();
-          default:
-            throw new Error(`encountered an unsupported type during deserialization ${primitiveType}`);
-        }
-      });
+    this.getCollectionOfPrimitiveValues = () => {
+      throw new Error(_TextParseNode.noStructuredDataMessage);
     };
     this.getCollectionOfEnumValues = (type) => {
       throw new Error(_TextParseNode.noStructuredDataMessage);
@@ -7277,7 +7163,7 @@ function createClientsV2Endpoint(client) {
   const adapter = new FetchRequestAdapter(authProvider);
   adapter.baseUrl = client.baseUrl;
   const adminClient = createAdminClient(adapter);
-  return adminClient.admin.api.byRealmName(client.realmName).clients.v2;
+  return adminClient.admin.api.byRealmName(client.realmName).clients.byVersion("v2");
 }
 var ClientsV2 = class {
   #client;
@@ -7512,12 +7398,6 @@ var Clients = class extends Resource {
     urlParamKeys: ["id"],
     queryParamKeys: ["scope"]
   });
-  evaluateGenerateSamlResponse = this.makeRequest({
-    method: "GET",
-    path: "/{id}/evaluate-scopes/generate-example-saml-response",
-    urlParamKeys: ["id"],
-    queryParamKeys: ["scope", "userId"]
-  });
   evaluateGenerateAccessToken = this.makeRequest({
     method: "GET",
     path: "/{id}/evaluate-scopes/generate-example-access-token",
@@ -7683,25 +7563,22 @@ var Clients = class extends Resource {
     urlParamKeys: ["id"]
   });
   async createOrUpdatePolicy(payload) {
-    try {
-      const policyFound = await this.findPolicyByName({
-        id: payload.id,
-        name: payload.policyName
-      });
+    const policyFound = await this.findPolicyByName({
+      id: payload.id,
+      name: payload.policyName
+    });
+    if (policyFound) {
       await this.updatePolicy({
         id: payload.id,
         policyId: policyFound.id,
         type: payload.policy.type
       }, payload.policy);
-      return await this.findPolicyByName({
+      return this.findPolicyByName({
         id: payload.id,
         name: payload.policyName
       });
-    } catch (error) {
-      if (error instanceof NetworkError && error.response.status === 404) {
-        return this.createPolicy({ id: payload.id, type: payload.policy.type }, payload.policy);
-      }
-      throw error;
+    } else {
+      return this.createPolicy({ id: payload.id, type: payload.policy.type }, payload.policy);
     }
   }
   /**
@@ -9312,68 +9189,6 @@ var Users = class extends Resource {
     path: "/{id}/consents/{clientId}",
     urlParamKeys: ["id", "clientId"]
   });
-  /**
-   * list verifiable credentials for a user
-   */
-  listVerifiableCredentials = this.makeRequest({
-    method: "GET",
-    path: "/{id}/vc/credentials",
-    urlParamKeys: ["id"]
-  });
-  /**
-   * create a verifiable credential for a user
-   */
-  createVerifiableCredential = this.makeUpdateRequest({
-    method: "POST",
-    path: "/{id}/vc/credentials",
-    urlParamKeys: ["id"]
-  });
-  /**
-   * revoke a verifiable credential from a user
-   */
-  revokeVerifiableCredential = this.makeRequest({
-    method: "DELETE",
-    path: "/{id}/vc/credentials/{credentialScopeName}",
-    urlParamKeys: ["id", "credentialScopeName"]
-  });
-  /**
-   * update a verifiable credential for a user (refreshes user attributes snapshot and increments revision)
-   */
-  updateVerifiableCredential = this.makeRequest({
-    method: "PUT",
-    path: "/{id}/vc/credentials/{credentialScopeName}",
-    urlParamKeys: ["id", "credentialScopeName"]
-  });
-  /**
-   * Send credential offer of specified verifiable credential to this user by email.
-   * An email contains a link the user can click to see the page with credential offer, from which he can obtain verifiable credential to his wallet.
-   */
-  sendVerifiableCredentialOffer = this.makeUpdateRequest({
-    method: "PUT",
-    path: "/{id}/vc/credentials/send-credential-offer",
-    urlParamKeys: ["id"],
-    queryParamKeys: ["lifespan", "redirectUri", "clientId"],
-    keyTransform: {
-      clientId: "client_id",
-      redirectUri: "redirect_uri"
-    }
-  });
-  /**
-   * list issued verifiable credentials for a user
-   */
-  listIssuedVerifiableCredentials = this.makeRequest({
-    method: "GET",
-    path: "/{id}/vc/issued-credentials",
-    urlParamKeys: ["id"]
-  });
-  /**
-   * revoke an issued verifiable credential
-   */
-  revokeIssuedVerifiableCredential = this.makeRequest({
-    method: "DELETE",
-    path: "/{id}/vc/issued-credentials/{credentialId}",
-    urlParamKeys: ["id", "credentialId"]
-  });
   getUnmanagedAttributes = this.makeRequest({
     method: "GET",
     path: "/{id}/unmanagedAttributes",
@@ -9494,7 +9309,7 @@ var getToken = async (settings) => {
   url.pathname = joinPath(url.pathname, pathTemplate.expand({
     realmName: settings.realmName ?? defaultRealm
   }));
-  const credentials = settings.credentials ?? {};
+  const credentials = settings.credentials || {};
   const payload = stringifyQueryParams({
     username: credentials.username,
     password: credentials.password,
@@ -9528,7 +9343,7 @@ var getToken = async (settings) => {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/utils/decode.js
 function decodeToken(token) {
-  const [, payload] = token.split(".");
+  const [, payload] = token?.split(".") || [];
   if (typeof payload !== "string") {
     return {};
   }

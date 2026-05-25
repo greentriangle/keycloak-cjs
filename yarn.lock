@@ -117,10 +117,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.20.2.tgz#9c907b21e30a52db959ba4f80bb01a0cc403d5cc"
   integrity sha512-N49X4lJX27+l9jbLKSqZ6bKNjzQvHaT8IIFUy+YIqmXQdjYCToGWwOItDrfby14c78aDd5NHQl29xingXfCdLQ==
 
-"@keycloak/keycloak-admin-client@26.6.1":
-  version "26.6.1"
-  resolved "https://registry.yarnpkg.com/@keycloak/keycloak-admin-client/-/keycloak-admin-client-26.6.1.tgz#3728b30eebfb2c187766de69ed7213683773ddfa"
-  integrity sha512-IWzXCyUFhLkk2LkryCunEAGbRVB7ttC7WNmjXlFT83WlBrmxRCDKo52LzmIRgtWcy0VU1qe3Poj5BGyIkE1AnQ==
+"@keycloak/keycloak-admin-client@26.6.2":
+  version "26.6.2"
+  resolved "https://registry.yarnpkg.com/@keycloak/keycloak-admin-client/-/keycloak-admin-client-26.6.2.tgz#3c47278fe332945823efd0d18fe221bebb609c4b"
+  integrity sha512-CEqQ/fzJPkWOTM0LaUeH5KAKlCQGkqlydhpnxFM9Vx1rLyjr9AIqrENPNzt0owYDPIqrl6OYaFZJBAoH8woDpA==
   dependencies:
     "@microsoft/kiota-abstractions" "^1.0.0-preview.86"
     "@microsoft/kiota-http-fetchlibrary" "^1.0.0-preview.80"

@@ -9528,7 +9528,7 @@ var getToken = async (settings) => {
 
 // node_modules/@keycloak/keycloak-admin-client/lib/utils/decode.js
 function decodeToken(token) {
-  const [, payload] = token.split(".");
+  const [, payload] = token?.split(".") || [];
   if (typeof payload !== "string") {
     return {};
   }
